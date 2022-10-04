@@ -365,7 +365,6 @@ DenseTensor& DenseTensor::ShareDataWith(const DenseTensor& src) {
   meta_.layout = src.meta_.layout;
   meta_.offset = src.meta_.offset;
 #ifdef PADDLE_WITH_MKLDNN
-  format_ = src.format_;
   mem_desc_ = src.mem_desc_;
 #endif
   return *this;

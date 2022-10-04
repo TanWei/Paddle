@@ -85,15 +85,13 @@ class ReQuantOpKernel : public framework::OpKernel<T> {
     const T* input_data = input->data<T>();
 
     if (reorder_p == nullptr) {
-      auto dst_tz = phi::vectorize(output->dims());
       auto src_dt = framework::ToMKLDNNDataType(
           framework::TransToProtoVarType(input->dtype()));
       auto dst_dt = with_shift ? framework::MKLDNNDataType::u8 : src_dt;
 
-      auto src_md = platform::MKLDNNMemDesc({src_tz}, src_dt, input->format());
       src_memory = std::make_shared<dnnl::memory>(
-          src_md, engine, to_void_cast<T>(input_data));
-      auto dst_md = platform::MKLDNNMemDesc({dst_tz}, dst_dt, input->format());
+          input->mem_desc(), engine, to_void_cast<T>(input_data));
+      auto dst_md = platform::MKLDNNMemDesc({src_tz}, dst_dt, input->mem_desc().strides);
 
       dnnl::primitive_attr attri;
       int mask = 0;

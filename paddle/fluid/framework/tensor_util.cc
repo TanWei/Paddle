@@ -1205,8 +1205,8 @@ std::ostream& operator<<(std::ostream& os, const phi::DenseTensor& t) {
      << "\n";
 
 #ifdef PADDLE_WITH_MKLDNN
-  os << "  - format: "
-     << dnnl_fmt_tag2str(static_cast<dnnl_format_tag_t>(t.format())) << "\n";
+  os << "  - memory desc: "
+     << (t.mem_desc()) << "\n";
 #endif
 
   DenseTensor tensor;

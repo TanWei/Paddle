@@ -49,7 +49,7 @@ void SplitKernel(const Context& dev_ctx,
         out_vec_dims, offset, reorder_src_memory_p);
 
     auto reorder_dst_memory_p = reorder_handler.AcquireDstMemory(
-        out[i], out_vec_dims, x.format(), dev_ctx.GetPlace());
+        out[i], slice_mem_p->get_desc(), dev_ctx.GetPlace());
     auto reorder_p =
         reorder_handler.AcquireReorder(reorder_dst_memory_p, slice_mem_p);
 
