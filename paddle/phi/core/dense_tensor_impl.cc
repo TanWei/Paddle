@@ -351,15 +351,7 @@ std::vector<DenseTensor> DenseTensor::Chunk(int64_t chunks,
 
 #ifdef PADDLE_WITH_MKLDNN
 dnnl::memory::desc DenseTensor::mem_desc() const {
-  return mem_desc_ ? mem_desc_
-                   : dnnl::memory::desc(phi::vectorize(meta_.dims),
-                                        phi::TransToOneDNNDataType(meta_.dtype),
-                                        format_);
-}
-
-dnnl::memory::format_tag DenseTensor::format() const {
-  return mem_desc_ ? paddle::platform::GetMKLDNNFormat(mem_desc_) : format_;
-}
+  return mem_desc_; 
 #endif
 
 // NOTE: For historical reasons, this interface has a special behavior,

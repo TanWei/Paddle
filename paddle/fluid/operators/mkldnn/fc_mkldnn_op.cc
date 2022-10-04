@@ -30,7 +30,6 @@ using framework::DataLayout;
 using framework::DDim;
 using framework::ExecutionContext;
 using framework::LoDTensor;
-using platform::GetMKLDNNFormat;
 using platform::MKLDNNDeviceContext;
 using platform::MKLDNNGetDataType;
 using platform::to_void_cast;

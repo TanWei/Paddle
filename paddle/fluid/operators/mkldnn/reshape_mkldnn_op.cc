@@ -31,7 +31,6 @@ namespace paddle {
 namespace operators {
 
 using paddle::framework::LoDTensor;
-using platform::GetMKLDNNFormat;
 using platform::to_void_cast;
 
 static std::vector<int> extract_shape(
@@ -89,8 +88,8 @@ class ReshapeMKLDNNKernel : public framework::OpKernel<T> {
     // reorder is done into a plain tag to allow usage with blocked formats
     auto reorder_dst_memory_p = reorder_handler.AcquireDstMemory(
         out, getPlainFormatTag(x), ctx.GetPlace());
-    auto reorder_p = reorder_handler.AcquireReorder(reorder_src_memory_p,
-                                                    reorder_dst_memory_p);
+    auto reorder_p = reorder_handler.AcquireReorder(reorder_dst_memory_p,
+                                                    reorder_src_memory_p);
 
     auto& astream = platform::MKLDNNDeviceContext::tls().get_stream();
     reorder_p->execute(astream, *reorder_src_memory_p, *reorder_dst_memory_p);
@@ -98,9 +97,7 @@ class ReshapeMKLDNNKernel : public framework::OpKernel<T> {
     astream.wait();
 
     out->Resize(out_dims);
-    out->set_layout(framework::DataLayout::kMKLDNN);
-    out->set_format(GetMKLDNNFormat(
-        reorder_dst_memory_p->get_desc().reshape(phi::vectorize(out_dims))));
+    out->set_mem_desc(reorder_dst_memory_p->get_desc().reshape(phi::vectorize(out_dims)));
   }
 
   void InferInOutShape(const framework::ExecutionContext& ctx,
@@ -362,17 +359,15 @@ class ReshapeGradMKLDNNKernel : public ReshapeMKLDNNKernel<T, op_name> {
         dout->format(), platform::to_void_cast(dout->data<T>()));
     auto reorder_dst_memory_p = reorder_handler.AcquireDstMemory(
         dx, this->getPlainFormatTag(dout), ctx.GetPlace());
-    auto reorder_p = reorder_handler.AcquireReorder(reorder_src_memory_p,
-                                                    reorder_dst_memory_p);
+    auto reorder_p = reorder_handler.AcquireReorder(reorder_dst_memory_p,
+                                                    reorder_src_memory_p);
 
     auto& astream = platform::MKLDNNDeviceContext::tls().get_stream();
     reorder_p->execute(astream, *reorder_src_memory_p, *reorder_dst_memory_p);
     astream.wait();
 
     dx->Resize(dx_dims);
-    dx->set_layout(framework::DataLayout::kMKLDNN);
-    dx->set_format(GetMKLDNNFormat(
-        reorder_dst_memory_p->get_desc().reshape(phi::vectorize(dx_dims))));
+    dx->set_mem_desc(reorder_dst_memory_p->get_desc().reshape(phi::vectorize(dx_dims)));
   }
 
   void InferOutputShapeInGrad(const framework::ExecutionContext& ctx,

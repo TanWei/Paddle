@@ -28,7 +28,6 @@ using dnnl::primitive;
 using dnnl::stream;
 using framework::DataLayout;
 
-using platform::GetMKLDNNFormat;
 using platform::MKLDNNDeviceContext;
 using platform::to_void_cast;
 
