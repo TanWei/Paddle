@@ -1205,8 +1205,21 @@ std::ostream& operator<<(std::ostream& os, const phi::DenseTensor& t) {
      << "\n";
 
 #ifdef PADDLE_WITH_MKLDNN
+auto represent_mem_desc = [&](const dnnl::memory:desc &md)
+{
+    auto vec = md.strides;
+    if (vec.empty()) {
+        return std::string();
+    }
+ 
+    return std::accumulate(vec.begin() + 1, vec.end(), std::to_string(vec[0]),
+                [](const std::string& a, T b){
+                    return a + ", " + std::to_string(b);
+                });
+}
+
   os << "  - memory desc: "
-     << (t.mem_desc()) << "\n";
+     << (represent_mem_desc(t.mem_desc())) << "\n";
 #endif
 
   DenseTensor tensor;
